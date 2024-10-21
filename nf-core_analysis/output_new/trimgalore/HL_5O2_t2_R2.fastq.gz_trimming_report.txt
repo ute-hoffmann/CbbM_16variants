@@ -1,0 +1,86 @@
+
+SUMMARISING RUN PARAMETERS
+==========================
+Input filename: HL_5O2_t2_R2.fastq.gz
+Trimming mode: single-end
+Trim Galore version: 0.6.7
+Cutadapt version: 3.4
+Python version: could not detect
+Number of cores used for trimming: 2
+Quality Phred score cutoff: 20
+Quality encoding type selected: ASCII+33
+Using Illumina adapter for trimming (count: 38). Second best hit was Nextera (count: 0)
+Adapter sequence: 'AGATCGGAAGAGC' (Illumina TruSeq, Sanger iPCR; auto-detected)
+Maximum trimming error rate: 0.1 (default)
+Minimum required adapter overlap (stringency): 6 bp
+Minimum required sequence length before a sequence gets removed: 20 bp
+Output file will be GZIP compressed
+
+
+This is cutadapt 3.4 with Python 3.9.6
+Command line parameters: -j 2 -e 0.1 -q 20 -O 6 -a AGATCGGAAGAGC HL_5O2_t2_R2.fastq.gz
+Processing reads on 2 cores in single-end mode ...
+Finished in 0.85 s (7 µs/read; 8.24 M reads/minute).
+
+=== Summary ===
+
+Total reads processed:                 116,836
+Reads with adapters:                     1,618 (1.4%)
+Reads written (passing filters):       116,836 (100.0%)
+
+Total basepairs processed:    10,114,687 bp
+Quality-trimmed:                  36,602 bp (0.4%)
+Total written (filtered):     10,057,626 bp (99.4%)
+
+=== Adapter 1 ===
+
+Sequence: AGATCGGAAGAGC; Type: regular 3'; Length: 13; Trimmed: 1618 times
+
+No. of allowed errors:
+1-9 bp: 0; 10-13 bp: 1
+
+Bases preceding removed adapters:
+  A: 94.7%
+  C: 1.7%
+  G: 0.6%
+  T: 3.0%
+  none/other: 0.0%
+WARNING:
+    The adapter is preceded by "A" extremely often.
+    The provided adapter sequence could be incomplete at its 5' end.
+
+Overview of removed sequences
+length	count	expect	max.err	error counts
+7	6	7.1	0	6
+8	4	1.8	0	4
+9	7	0.4	0	7
+10	409	0.1	1	37 372
+11	154	0.0	1	12 142
+12	240	0.0	1	12 228
+13	95	0.0	1	2 93
+14	442	0.0	1	7 435
+15	124	0.0	1	0 124
+16	114	0.0	1	21 93
+17	2	0.0	1	0 2
+18	1	0.0	1	0 1
+19	2	0.0	1	0 2
+20	3	0.0	1	1 2
+21	1	0.0	1	0 1
+22	3	0.0	1	0 3
+23	2	0.0	1	2
+24	1	0.0	1	0 1
+25	3	0.0	1	1 2
+26	2	0.0	1	1 1
+27	1	0.0	1	1
+45	2	0.0	1	0 2
+
+
+WARNING:
+    One or more of your adapter sequences may be incomplete.
+    Please see the detailed output above.
+
+RUN STATISTICS FOR INPUT FILE: HL_5O2_t2_R2.fastq.gz
+=============================================
+116836 sequences processed in total
+Sequences removed because they became shorter than the length cutoff of 20 bp:	8 (0.0%)
+

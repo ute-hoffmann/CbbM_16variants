@@ -1,0 +1,91 @@
+This is cutadapt 4.6 with Python 3.9.18
+Command line parameters: -Z --cores 5 -g GTCTAGAatcgccgaaagtaattcaactccattaa...TCTAGATGCTTACTAGTTACCGCGGCCA -e 0.2 -o HL_5O2_t6_R1.trim.fastq.gz HL_5O2_t6_R1_trimmed.fq.gz
+Processing single-end reads on 5 cores ...
+Finished in 0.420 s (9.777 µs/read; 6.14 M reads/minute).
+
+=== Summary ===
+
+Total reads processed:                  43,004
+Reads with adapters:                    40,340 (93.8%)
+Reads written (passing filters):        43,004 (100.0%)
+
+Total basepairs processed:     3,702,766 bp
+Total written (filtered):      1,043,472 bp (28.2%)
+
+=== Adapter 1 ===
+
+Sequence: GTCTAGAATCGCCGAAAGTAATTCAACTCCATTAA...TCTAGATGCTTACTAGTTACCGCGGCCA; Type: linked; Length: 35+28; 5' trimmed: 40340 times; 3' trimmed: 40340 times
+
+Minimum overlap: 3+3
+No. of allowed errors:
+1-4 bp: 0; 5-9 bp: 1; 10-14 bp: 2; 15-19 bp: 3; 20-24 bp: 4; 25-29 bp: 5; 30-34 bp: 6; 35 bp: 7
+
+No. of allowed errors:
+1-4 bp: 0; 5-9 bp: 1; 10-14 bp: 2; 15-19 bp: 3; 20-24 bp: 4; 25-28 bp: 5
+
+Overview of removed sequences at 5' end
+length	count	expect	max.err	error counts
+3	1	671.9	0	1
+25	4	0.0	5	0 0 0 0 1 3
+26	152	0.0	5	1 7 18 41 50 35
+28	1	0.0	5	0 0 0 0 1
+33	1	0.0	6	0 0 0 0 0 0 1
+34	1	0.0	6	0 0 0 0 0 0 1
+35	145	0.0	7	2 3 7 12 27 31 35 28
+36	10490	0.0	7	214 743 1393 2189 2479 1803 1261 408
+37	15664	0.0	7	46 261 823 2347 4085 4433 2479 1190
+38	13857	0.0	7	254 2057 5639 3138 1586 757 306 120
+39	23	0.0	7	0 1 7 5 6 4
+40	1	0.0	7	0 0 1
+
+
+
+Overview of removed sequences at 3' end
+length	count	expect	max.err	error counts
+3	3	671.9	0	3
+4	4	168.0	0	0 4
+5	34	42.0	1	0 34
+6	9	10.5	1	0 9
+7	1	2.6	1	0 1
+8	1	0.7	1	0 1
+9	3	0.2	1	1 1 1
+12	1	0.0	2	0 1
+13	2	0.0	2	2
+14	3	0.0	2	0 2 1
+15	2	0.0	3	2
+16	4	0.0	3	0 1 2 1
+17	1	0.0	3	0 0 0 1
+18	1	0.0	3	0 0 0 1
+19	3	0.0	3	0 0 0 3
+20	3	0.0	4	1 2
+21	2	0.0	4	1 0 0 1
+22	4	0.0	4	0 2 0 0 2
+23	9	0.0	4	0 4 3 1 1
+24	28	0.0	4	8 6 9 2 2 1
+25	84	0.0	5	7 17 24 23 12 1
+26	87	0.0	5	15 17 28 14 6 7
+27	4525	0.0	5	2852 987 428 173 67 18
+28	32326	0.0	5	17647 10566 2716 841 392 164
+29	70	0.0	5	7 31 21 7 3 1
+30	11	0.0	5	1 3 1 4 1 1
+31	12	0.0	5	0 0 2 4 5 1
+32	18	0.0	5	0 2 4 4 6 2
+33	7	0.0	5	0 0 0 0 2 5
+34	17	0.0	5	0 1 2 5 5 4
+35	10	0.0	5	0 1 3 1 3 2
+36	31	0.0	5	2 3 8 3 5 10
+37	36	0.0	5	2 3 6 6 12 7
+38	66	0.0	5	4 7 17 16 10 12
+39	149	0.0	5	20 24 42 28 18 17
+40	369	0.0	5	33 61 71 80 75 49
+41	785	0.0	5	95 140 166 181 125 78
+42	439	0.0	5	42 66 79 112 89 51
+43	1015	0.0	5	104 192 233 238 162 86
+44	9	0.0	5	1 3 2 1 2
+45	5	0.0	5	0 2 0 2 1
+46	14	0.0	5	0 0 0 12 2
+47	120	0.0	5	0 0 4 106 9 1
+49	1	0.0	5	0 0 0 0 0 1
+51	3	0.0	5	0 0 0 0 2 1
+53	4	0.0	5	0 0 0 0 4
+54	9	0.0	5	0 0 0 6 2 1

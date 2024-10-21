@@ -1,0 +1,67 @@
+This is cutadapt 4.6 with Python 3.9.18
+Command line parameters: -Z --cores 5 -g GTCTAGAatcgccgaaagtaattcaactccattaa...TCTAGATGCTTACTAGTTACCGCGGCCA -e 0.2 -o HL_5N2_t7_R3.trim.fastq.gz HL_5N2_t7_R3_trimmed.fq.gz
+Processing single-end reads on 5 cores ...
+Finished in 0.278 s (24.407 µs/read; 2.46 M reads/minute).
+
+=== Summary ===
+
+Total reads processed:                  11,374
+Reads with adapters:                    10,989 (96.6%)
+Reads written (passing filters):        11,374 (100.0%)
+
+Total basepairs processed:       976,590 bp
+Total written (filtered):        254,523 bp (26.1%)
+
+=== Adapter 1 ===
+
+Sequence: GTCTAGAATCGCCGAAAGTAATTCAACTCCATTAA...TCTAGATGCTTACTAGTTACCGCGGCCA; Type: linked; Length: 35+28; 5' trimmed: 10989 times; 3' trimmed: 10989 times
+
+Minimum overlap: 3+3
+No. of allowed errors:
+1-4 bp: 0; 5-9 bp: 1; 10-14 bp: 2; 15-19 bp: 3; 20-24 bp: 4; 25-29 bp: 5; 30-34 bp: 6; 35 bp: 7
+
+No. of allowed errors:
+1-4 bp: 0; 5-9 bp: 1; 10-14 bp: 2; 15-19 bp: 3; 20-24 bp: 4; 25-28 bp: 5
+
+Overview of removed sequences at 5' end
+length	count	expect	max.err	error counts
+35	40	0.0	7	0 0 2 2 6 8 7 15
+36	2927	0.0	7	50 236 341 652 656 523 364 105
+37	4245	0.0	7	9 47 200 690 1140 1242 631 286
+38	3766	0.0	7	70 534 1638 852 411 172 64 25
+39	11	0.0	7	0 0 3 3 4 1
+
+
+
+Overview of removed sequences at 3' end
+length	count	expect	max.err	error counts
+5	4	11.1	1	0 4
+6	1	2.8	1	0 1
+9	1	0.0	1	0 0 1
+15	2	0.0	3	0 2
+16	1	0.0	3	0 1
+19	1	0.0	3	0 0 1
+21	1	0.0	4	0 0 0 1
+22	2	0.0	4	0 0 2
+24	6	0.0	4	1 2 1 2
+25	24	0.0	5	2 10 5 4 1 2
+26	30	0.0	5	8 10 6 5 1
+27	1383	0.0	5	913 323 105 28 13 1
+28	8865	0.0	5	5197 2807 598 183 57 23
+29	17	0.0	5	1 9 6 0 1
+30	4	0.0	5	1 0 2 1
+31	5	0.0	5	0 2 0 0 2 1
+32	4	0.0	5	0 1 0 1 1 1
+33	3	0.0	5	0 1 1 0 0 1
+34	2	0.0	5	0 0 0 0 0 2
+35	2	0.0	5	0 0 2
+36	4	0.0	5	1 1 0 0 1 1
+37	6	0.0	5	1 0 2 0 2 1
+38	12	0.0	5	1 1 2 1 4 3
+39	21	0.0	5	5 2 3 3 4 4
+40	72	0.0	5	11 13 18 16 11 3
+41	160	0.0	5	15 25 39 38 29 14
+42	83	0.0	5	5 10 25 18 11 14
+43	270	0.0	5	29 63 71 54 28 25
+44	2	0.0	5	1 0 1
+45	1	0.0	5	0 1

@@ -1,0 +1,18 @@
+# Program:featureCounts v2.0.1; Command:"featureCounts" "-F" "SAF" "-T" "5" "-a" "2023-05-23_Rubisco_barcodes.saf" "-s" "0" "-o" "HL_5N2_t3_R4.featureCounts.txt" "HL_5N2_t3_R4.bam" 
+Geneid	Chr	Start	End	Strand	Length	HL_5N2_t3_R4.bam
+WT	WT	1	20	.	20	13175
+mut1	mut1	1	20	.	20	13089
+mut2	mut2	1	20	.	20	6915
+mut4	mut4	1	20	.	20	6581
+mut5	mut5	1	20	.	20	10373
+A	A	1	20	.	20	6751
+B	B	1	20	.	20	8026
+I	I	1	20	.	20	14304
+K	K	1	20	.	20	5404
+E	E	1	20	.	20	11341
+G	G	1	20	.	20	9566
+2I2	2I2	1	20	.	20	6187
+2A1	2A1	1	20	.	20	9182
+A41	A41	1	20	.	20	10043
+2B4	2B4	1	20	.	20	6456
+4x	4x	1	21	.	21	8359

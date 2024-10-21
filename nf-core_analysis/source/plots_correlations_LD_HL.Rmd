@@ -1,0 +1,128 @@
+---
+title: "Plot correlation of light-dark samples to continuous light samples of cultivations performed in same Multi-Cultivator"
+author: 'SYSTEM: `r version[13]`'
+date: 'DATE: `r Sys.time()`'
+output:
+  html_document:
+    toc: yes
+    df_print: paged
+  pdf_document:
+    toc: yes
+  html_notebook:
+    theme: cosmo
+    toc: yes
+    number_sections: yes
+params:
+  cpus: 2
+  input_dir: ./
+  meta: ''
+---
+
+```{r load-required-packages, include = FALSE}
+library(ggplot2)
+library(tidyverse)
+library(DESeq2)
+library(DescTools)
+library(colorblindr) #https://github.com/clauswilke/colorblindr
+library(tidyr)
+library(ggrepel)
+library(dplyr)
+library(ggnewscale)
+library(Heatplus) # bioconductor
+library(ComplexHeatmap) # bioconductor
+library(edgeR)
+library(Mfuzz)
+library(ggVennDiagram)
+library(pheatmap)
+```
+
+```{r load-required-datasets, message=FALSE, echo=FALSE}
+count_matrix <- read_tsv("../output_compare_HLHC_LDHC/prepare/all_counts.tsv")
+count_matrix$Gene <- NULL
+
+df_samplesheet <- readr::read_csv("../input/samplesheet_Rubisco_only_MC_HLHC_LDHC.csv", col_types = cols()) %>%
+    select(all_of(c("sample", "condition", "replicate", "time", "group", "reference_group"))) %>%
+    dplyr::mutate(group = factor(`group`))
+df_samplesheet$name <- paste("gen_", df_samplesheet$time, "_r_", df_samplesheet$replicate, sep="")
+```
+
+# Sample-sample correlation
+
+```{r, fig.width = 12, fig.height = 10, warning = FALSE, message=FALSE}
+df_counts <- tidyr::pivot_longer(count_matrix,
+    cols = 2:ncol(count_matrix),
+    names_to = "sample", values_to = "n_reads"
+)
+
+# sort
+df_counts <- arrange(df_counts, sample)
+#df_counts <- left_join(df_samplesheet, df_counts)
+
+df_correlation <- df_counts %>%
+    tidyr::pivot_wider(names_from = "sample", values_from = "n_reads") %>%
+    dplyr::select(-c(1)) %>%
+    cor()
+
+plot_replicate_correlation <- df_correlation %>%
+    dplyr::as_tibble() %>%
+    dplyr::mutate(sample1 = colnames(.)) %>%
+    tidyr::pivot_longer(
+        cols = !sample1,
+        names_to = "sample2", values_to = "cor_coef"
+    ) %>%
+    ggplot(aes(x = sample1, y = sample2, fill = cor_coef)) +
+    geom_tile() +
+    geom_text(color = grey(0.4), aes(label = round(cor_coef, 2))) +
+    theme_light() +
+    labs(title = "", x = "", y = "") +
+    theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
+    scale_fill_gradientn(
+        colours = c("#E7298A", grey(0.9), "#66A61E"),
+        limits = c(-1, 1)
+    )
+
+plot_replicate_correlation
+ggsave("../plots/correlation/pdf/correlation_samples.pdf", plot=plot_replicate_correlation, width=12, height=12)
+ggsave("../plots/correlation/png/correlation_samples.png", plot=plot_replicate_correlation, width=12, height=12)
+
+# https://bioinformatics.stackexchange.com/questions/22502/manually-set-range-of-colour-scale-in-pheatmap-in-r
+color.divisions <- 100
+
+annotation_days = data.frame(row.names=unique(row.names(df_correlation)), generation=as.character(c(0, 0, 0,0, 1,1,1,1,2,2,2,2,3,3,3,3,4,4,4,4,5,5,5,5,6,6,6,6,7,7,7,7,0,0,0,1,1,1,2,2,2,3,3,3,4,4,4,5,5,5)), condition=c(rep("cont",32), rep("LD", 18)), replicate=as.character(c(rep(c(1,2,3,4),8), rep(c(5,6,7), 6)))) 
+
+# https://stackoverflow.com/questions/41628450/r-pheatmap-change-annotation-colors-and-prevent-graphics-window-from-popping-up
+# choose colors for replicate that make difference between the two conditions clearly obvious --> four colours that are similar for HC, three that are similar for LD, let replicate 3 of LD _pop_
+# choose gradient of colors for generations
+# e.g. Tol from https://davidmathlogic.com/colorblind/#%23D81B60-%231E88E5-%23FFC107-%23004D40
+okabe <- c("#f0e442ff", "#e69f00ff", "#d55e00ff", "#cc79a7ff", "#009e73ff", "#56b4e9ff", "#0072b2ff", "#aaaaaaff")
+tol <- c("#882255ff","#aa4499ff","#cc6677ff","#ddcc77ff","#88cceeff","#44aa99ff","#117733ff","#332288ff")
+okabe_gen <- okabe
+names(okabe_gen) <- unique(annotation_days$generation)
+okabe_replic <- okabe[1:7]
+names(okabe_replic) <- unique(annotation_days$replicate)
+annotation_color_list <- list(condition=c("cont"=okabe[7], "LD"=okabe[2]), generation=okabe_gen, replicate=okabe_replic)
+
+okabe <- c("#fff2ecff","#f0e442ff", "#f5a700ff", "#9a4400ff", "#cc79a7ff", "#56b4e9ff", "#0072b2ff", "#003450ff")
+okabe_gen <- okabe
+names(okabe_gen) <- unique(annotation_days$generation)
+based_on_col <- c("#009affff","#007acbff","#005b98ff","#003d66ff","#ff9dd5ff","#cc84aeff","#9a5b83ff")
+names(based_on_col) <- unique(annotation_days$replicate)
+annotation_color_list <- list(condition=c("cont"="#005a96ff", "LD"="#c57ba5ff"), replicate=based_on_col, generation=okabe_gen)
+
+p <- pheatmap(df_correlation, display_numbers=TRUE, treeheight_col=0, cutree_rows = 3, cutree_cols = 3, annotation_row = annotation_days, annotation_colors = annotation_color_list, breaks = seq(-1,1, length.out=(color.divisions + 1)))
+p
+ggsave("../plots/correlation/png/correlation_samples_clustering.png", plot=p, width=11.5, height=8)
+ggsave("../plots/correlation/pdf/correlation_samples_clustering.pdf", plot=p, width=11.5, height=8)
+
+p <- pheatmap(df_correlation, display_numbers=FALSE, treeheight_col=0, cutree_rows = 3, cutree_cols = 3, annotation_row = annotation_days, annotation_colors = annotation_color_list, breaks = seq(-1,1, length.out=(color.divisions + 1)))
+p
+ggsave("../plots/correlation/png/correlation_samples_clustering_woNumbers.png", plot=p, width=11.5, height=8)
+ggsave("../plots/correlation/pdf/correlation_samples_clustering_woNumbers.pdf", plot=p, width=11.5, height=8)
+```
+
+# Session Info {.unnumbered}
+
+```{r sessionInfo, echo=FALSE}
+sessionInfo()
+```
+

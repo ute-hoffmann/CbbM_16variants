@@ -1,0 +1,8 @@
+Warning: skipping read 'VH00349:119:AACLJ3KM5:1:2609:38435:37747 1:N:0:CAGGCGAT+GTCAGTAC' because length (1) <= # seed mismatches (0)
+Warning: skipping read 'VH00349:119:AACLJ3KM5:1:2609:38435:37747 1:N:0:CAGGCGAT+GTCAGTAC' because it was < 2 characters long
+48650 reads; of these:
+  48650 (100.00%) were unpaired; of these:
+    5302 (10.90%) aligned 0 times
+    43348 (89.10%) aligned exactly 1 time
+    0 (0.00%) aligned >1 times
+89.10% overall alignment rate

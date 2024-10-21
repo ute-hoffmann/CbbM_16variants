@@ -1,0 +1,274 @@
+---
+title: "More detailed analysis of Rubisco fitness data"
+author: 'SYSTEM: `r version[13]`'
+date: 'DATE: `r Sys.time()`'
+output:
+  html_document:
+    toc: yes
+    df_print: paged
+  pdf_document:
+    toc: yes
+  html_notebook:
+    theme: cosmo
+    toc: yes
+    number_sections: yes
+params:
+  cpus: 2
+  input_dir: ./
+  meta: ''
+---
+
+```{r load-required-packages, include = FALSE}
+library(ggplot2)
+library(tidyverse)
+library(DESeq2)
+library(DescTools)
+library(colorblindr) #https://github.com/clauswilke/colorblindr
+library(tidyr)
+library(ggrepel)
+library(dplyr)
+library(ggnewscale)
+```
+
+```{r load-required-datasets, message=FALSE}
+count_matrix <- read_tsv("../output_new/prepare/all_counts.tsv")
+count_matrix$Gene <- NULL
+fitness_data <- read_tsv("../output_new/fitness/result.tsv")
+```
+
+# Prepare plot for pool
+
+The distribution of mutant variants in the pool before and after freezing the mutant pool are plotted. The count matrix has to be brought into the correct format for the DESeq2 analysis and a design matrix created.
+
+```{r prepare-count-matrix-DESeq2}
+count_matrix_pool <- as.data.frame(data.frame(sgRNA=count_matrix$sgRNA, pool1=count_matrix$pool_t0_R1, pool2=count_matrix$pool_t0_R2, pool3=count_matrix$pool_t0_R3))
+count_matrix_pool_t1 <- as.data.frame(data.frame(sgRNA=count_matrix$sgRNA, pool1=count_matrix$pool_t1_R1, pool2=count_matrix$pool_t1_R2, pool3=count_matrix$pool_t1_R3))
+
+row.names(count_matrix_pool) <- count_matrix_pool$sgRNA
+row.names(count_matrix_pool_t1) <- count_matrix_pool_t1$sgRNA
+count_matrix_pool$sgRNA <- NULL
+count_matrix_pool_t1$sgRNA <- NULL
+
+design_matrix <- data.frame(group=c("pool", "pool", "pool"))
+row.names(design_matrix) = c("pool1", "pool2", "pool3")
+```
+
+DESeq2 is used to normalize among the three replicates.
+
+```{r normalize-using-DESeq2, message=FALSE}
+ddsPool <- DESeqDataSetFromMatrix(
+  countData = count_matrix_pool,
+  colData = design_matrix,
+  design = ~ 1)
+ddsPool <- estimateSizeFactors(ddsPool)
+counts_norm_ddsPool <- as.data.frame(counts(ddsPool, normalized=TRUE))
+
+ddsPool_t1 <- DESeqDataSetFromMatrix(
+  countData = count_matrix_pool_t1,
+  colData = design_matrix,
+  design = ~ 1)
+ddsPool_t1 <- estimateSizeFactors(ddsPool_t1)
+counts_norm_ddsPool_t1 <- as.data.frame(counts(ddsPool_t1, normalized=TRUE))
+```
+
+Using ggplot2, a plot showing mean and stdev of the pool samples is prepared
+
+```{r plot-pool, message=FALSE}
+df_plot <- data.frame(mut=row.names(counts_norm_ddsPool), mean_count=apply(counts_norm_ddsPool, 1, mean), stdev=apply(counts_norm_ddsPool,1,sd))
+df_plot$mut <- factor(df_plot$mut, levels=c("WT", "mut4", "mut2", "mut5", "mut1", "K", "B", "I", "G", "E", "A", "2B4", "2I2", "A41", "2A1", "4x"))
+p <- ggplot(df_plot) + geom_bar(aes(x=mut, y=mean_count), stat="identity") + geom_errorbar(aes(x=mut, ymin=mean_count-stdev, ymax=mean_count+stdev), width=0.4) + theme_light() + xlab("Mutant variant") + ylab("Mean of normalized read counts")
+p
+ggsave("../output_images/pool_distribution.pdf", plot=p)
+
+df_plot <- data.frame(mut=row.names(counts_norm_ddsPool_t1), mean_count=apply(counts_norm_ddsPool_t1, 1, mean), stdev=apply(counts_norm_ddsPool_t1,1,sd))
+df_plot$mut <- factor(df_plot$mut, levels=c("WT", "mut4", "mut2", "mut5", "mut1", "K", "B", "I", "G", "E", "A", "2B4", "2I2", "A41", "2A1", "4x"))
+p <- ggplot(df_plot) + geom_bar(aes(x=mut, y=mean_count), stat="identity") + geom_errorbar(aes(x=mut, ymin=mean_count-stdev, ymax=mean_count+stdev), width=0.4) + theme_light() + xlab("Mutant variant") + ylab("Mean of normalized read counts")
+p
+ggsave("../output_images/pool_distribution_afterFreeze.pdf", plot=p)
+```
+
+Calculate the Gini coefficient of the mean pool samples. "A Gini coefficient of 0 reflects perfect equality, [...] while a Gini coefficient of 1 [...] reflects maximal inequality" (en.wikipedia.org). 
+Gini coefficients for all samples are pretty low. (<0.16)
+
+```{r Gini-index}
+Gini(df_plot$mean_count, unbiased=FALSE)
+Gini(count_matrix_pool$pool1, unbiased=FALSE)
+Gini(count_matrix_pool$pool2, unbiased=FALSE)
+Gini(count_matrix_pool$pool3, unbiased=FALSE)
+```
+
+# Prepare different plots to visualize fitness values
+
+```{r plotting-functions, include=FALSE}
+linetype_vect <- c("solid", "dashed", "dotted", "dotdash", "longdash", "twodash","solid", "dashed", "dotted", "dotdash", "longdash", "twodash", "solid", "dashed", "dotted", "dotdash")
+
+lineplot_Rubisco <- function(df_to_plot, file_name, title_plot){
+  df_to_plot$sgRNA <- factor(df_to_plot$sgRNA, levels=c("WT", "mut4", "mut2", "mut5", "mut1", "K", "B", "I", "G", "E", "A", "2B4", "2I2", "A41", "2A1", "4x"))
+  plot_p <- ggplot(df_to_plot, aes(x=time, y=log2FoldChange, color=sgRNA)) + geom_line(aes(linetype=sgRNA)) + theme_light() + ggtitle(title_plot) + xlab("Time (generations)") + ylab("log$_2$FC") + scale_linetype_manual(values=linetype_vect) + coord_cartesian(ylim=c(-2.75, +4.1), xlim=c(0,10))
+  ggsave(file_name, plot=plot_p, width=18, height=18, units="cm")
+  return(plot_p)
+}
+
+
+lineplot_gray_Rubisco <- function(df_to_plot, file_name, title_plot){
+  df_to_plot$sgRNA <- factor(df_to_plot$sgRNA, levels=c("WT", "mut4", "mut2", "mut5", "mut1", "K", "B", "I", "G", "E", "A", "2B4", "2I2", "A41", "2A1", "4x"))
+  plot_p <- ggplot(df_to_plot, aes(x=time, y=log2FoldChange, color=sgRNA, alpha=sgRNA)) + geom_line(linewidth=1.2) + theme_light() + ggtitle(title_plot) + xlab("Time (generations)") + ylab("Log2FC") + scale_linetype_manual(values=linetype_vect) + scale_color_manual(values=c("WT"="#000000ff", "K"="lightgray", "mut4"="#e59f02ff", "mut2"="#70b1e3ff", "mut5"="#449b76ff", "mut1"="#ba80a3ff", "A"="lightgray", "B"="lightgray", "E"="lightgray", "G"="lightgray", "I"="lightgray", "A41"="lightgray", "2A1"="lightgray", "2B4"="lightgray", "2I2"="lightgray", "4x"="#d75c00ff")) + scale_alpha_manual(values=c(c("WT"=1, "K"=0.7, "mut1"=1, "mut2"=1, "mut4"=1, "mut5"=1, "A"=0.7, "B"=0.7, "E"=0.7, "G"=0.7, "I"=0.7, "A41"=0.7, "2A1"=0.7, "2B4"=0.7, "2I2"=0.7, "4x"=1))) + coord_cartesian(ylim=c(-2.75, +4.1), xlim=c(0,10)) # + ylim(-2.75, +4.1)
+  ggsave(file_name, plot=plot_p, width=18, height=18, units="cm")
+  return(plot_p)
+}
+
+#p <- ggplot(combined_df, aes(x=time, y=mean, ymin=mean-margin, ymax=mean+margin, fill=strain, colour=strain, linetype=strain)) + geom_line() + geom_ribbon(alpha=0.25, linetype=0) + theme_light() + scale_y_log10() + scale_colour_manual(name="", values=colour_v) + scale_fill_manual(name="", values=colour_v) 
+#p
+
+# https://support.bioconductor.org/p/80725/#80729
+lineplot_CVinterval_gray_Rubisco <- function(df_to_plot, file_name, title_plot){
+  df_to_plot$sgRNA <- factor(df_to_plot$sgRNA, levels=c("WT", "mut4", "mut2", "mut5", "mut1", "K", "B", "I", "G", "E", "A", "2B4", "2I2", "A41", "2A1", "4x"))
+  df_to_plot$conf <- qnorm(0.975)*df_to_plot$lfcSE
+  plot_p <- ggplot(df_to_plot, aes(x=time, y=log2FoldChange, ymin=log2FoldChange-conf, ymax=log2FoldChange+conf)) + new_scale("alpha") + scale_color_manual(values=c("WT"="#000000ff", "K"="lightgray", "mut4"="#e59f02ff", "mut2"="#70b1e3ff", "mut5"="#449b76ff", "mut1"="#ba80a3ff", "A"="lightgray", "B"="lightgray", "E"="lightgray", "G"="lightgray", "I"="lightgray", "A41"="lightgray", "2A1"="lightgray", "2B4"="lightgray", "2I2"="lightgray", "4x"="#d75c00ff")) + scale_fill_manual(values=c("WT"="#000000ff", "K"="lightgray", "mut4"="#e59f02ff", "mut2"="#70b1e3ff", "mut5"="#449b76ff", "mut1"="#ba80a3ff", "A"="lightgray", "B"="lightgray", "E"="lightgray", "G"="lightgray", "I"="lightgray", "A41"="lightgray", "2A1"="lightgray", "2B4"="lightgray", "2I2"="lightgray", "4x"="#d75c00ff")) + scale_alpha_manual(values=c(c("WT"=1, "K"=0.7, "mut1"=1, "mut2"=1, "mut4"=1, "mut5"=1, "A"=0.7, "B"=0.7, "E"=0.7, "G"=0.7, "I"=0.7, "A41"=0.7, "2A1"=0.7, "2B4"=0.7, "2I2"=0.7, "4x"=1))) + geom_line(aes(alpha=sgRNA, color=sgRNA)) + new_scale("linetype") + new_scale("alpha") + scale_alpha_manual(values=c(c("WT"=0.1, "K"=0, "mut1"=0.1, "mut2"=0.1, "mut4"=0.1, "mut5"=0.1, "A"=0, "B"=0, "E"=0, "G"=0, "I"=0, "A41"=0, "2A1"=0, "2B4"=0, "2I2"=0, "4x"=0.1))) + geom_ribbon(linetype=0, aes(alpha=sgRNA, fill=sgRNA, color=sgRNA)) + theme_light() + ggtitle(title_plot) + xlab("Time (generations)") + ylab("Log2FC")  + coord_cartesian(ylim=c(-2.75, +4.1), xlim=c(0,10))# + ylim(-2.75, +4.1)
+  ggsave(file_name, plot=plot_p, width=18, height=18, units="cm")
+  return(plot_p)
+}
+
+barplot_Rubisco <- function(df_to_plot, file_name, title_plot){
+  df_to_plot <- unique(df_to_plot[c("sgRNA", "fitness")])
+  df_to_plot$sgRNA <- factor(df_to_plot$sgRNA, levels=c("WT", "mut4", "mut2", "mut5", "mut1", "K", "B", "I", "G", "E", "A", "2B4", "2I2", "A41", "2A1", "4x"))
+  plot_bar <- ggplot(df_to_plot, aes(y=fitness, x=sgRNA)) + geom_bar(stat="identity")+ theme_light() + ggtitle(title_plot) + xlab("Mutant variant") + ylab("Fitness")
+  ggsave(file_name, plot=plot_bar)
+  return(plot_bar)
+}
+```
+
+Plot for constant light, 5% CO2, N2 conditions:
+
+```{r HL_5N2}
+df_HL_5N2 <- subset(fitness_data, fitness_data$condition=="HL_5N2")
+a <- lineplot_Rubisco(df_to_plot=df_HL_5N2, file_name="../output_images/lineplot/HL_5N2_lineplot.pdf", title_plot="Constant light, 5% CO2, N2")
+a
+a <- lineplot_gray_Rubisco(df_to_plot=df_HL_5N2, file_name="../output_images/lineplot_gray/HL_5N2_lineplot.pdf", title_plot="Constant light, 5% CO2, N2")
+a
+a <- barplot_Rubisco(df_HL_5N2, "../output_images/barplots/HL_5N2_barplot.pdf", "Constant light, 5% CO2, N2")
+a
+a <- lineplot_CVinterval_gray_Rubisco(df_to_plot=df_HL_5N2, file_name="../output_images/lineplot_gray/HL_5N2_lineplot_ribbon.pdf", title_plot="Constant light, 5% CO2, N2")
+a
+```
+
+
+```{r HL_5O2}
+HL_5O2 <- subset(fitness_data, fitness_data$condition=="HL_5O2")
+a <- lineplot_Rubisco(HL_5O2, "../output_images/lineplot/HL_5O2_lineplot.pdf", "Constant light, 5% CO2, ambient O2")
+a
+a <- lineplot_gray_Rubisco(HL_5O2, "../output_images/lineplot_gray/HL_5O2_lineplot.pdf", "Constant light, 5% CO2, ambient O2")
+a
+a <- barplot_Rubisco(HL_5O2, "../output_images/barplots/HL_5O2_barplot.pdf", "Constant light, 5% CO2, ambient O2")
+a
+a <- lineplot_CVinterval_gray_Rubisco(df_to_plot=HL_5O2, file_name="../output_images/lineplot_gray/HL_5O2_lineplot_ribbon.pdf", title_plot="Constant light, 5% CO2, N2")
+a
+```
+
+
+```{r HL_pool}
+pool <- subset(fitness_data, fitness_data$condition=="pool")
+a <- lineplot_Rubisco(pool, "../output_images/lineplot/pool_lineplot.pdf", "pool")
+a
+a <- barplot_Rubisco(pool, "../output_images/barplots/pool_barplot.pdf", "pool")
+a
+```
+
+```{r LD_N2}
+LD_N2 <- subset(fitness_data, fitness_data$condition=="LD_N2")
+a <- lineplot_Rubisco(LD_N2, "../output_images/lineplot/light-dark_lineplot.pdf", "Light-dark cycles, 5% CO2, N2")
+a
+a <- lineplot_gray_Rubisco(LD_N2, "../output_images/lineplot_gray/light-dark_lineplot.pdf", "Light-dark cycles, 5% CO2, N2")
+a
+a <- lineplot_CVinterval_gray_Rubisco(df_to_plot=LD_N2, file_name="../output_images/lineplot_gray/light-dark_lineplot_ribbon.pdf", title_plot="Light-dark cycles, 5% CO2, N2")
+a
+a <- barplot_Rubisco(LD_N2, "../output_images/barplots/light-dark_barplot.pdf", "Light-dark cycles, 5% CO2, N2")
+a
+```
+
+
+```{r barplot of all}
+fitness_data_to_plot <- unique(fitness_data[c("sgRNA", "fitness", "condition")])
+fitness_data_to_plot <- subset(fitness_data_to_plot, fitness_data_to_plot$condition=="HL_5N2" | fitness_data_to_plot$condition=="HL_5O2" | fitness_data_to_plot$condition=="LD_N2")
+fitness_data_to_plot$sgRNA <- factor(fitness_data_to_plot$sgRNA, levels=c("WT", "mut4", "mut2", "mut5", "mut1", "K", "B", "I", "G", "E", "A", "2B4", "2I2", "A41", "2A1", "4x"))
+p <- ggplot(fitness_data_to_plot, aes(y=fitness, x=sgRNA, fill=condition)) + geom_bar(stat="identity", position="dodge")+ theme_light() + xlab("Mutant variant") + ylab("Fitness") + scale_fill_manual(values=c("HL_5N2"="#999999ff", "HL_5O2"="#d45d00ff", "LD_N2"="#0072b1ff"))# scale_fill_OkabeIto()
+p
+ggsave("../output_images/barplot_differentconditions.pdf", plot=p, height=11, width=18, units="cm")
+cvd_grid(p)
+```
+```{r barplot-of-all-scaled}
+fitness_data_to_plot <- unique(fitness_data[c("sgRNA", "fitness", "condition")])
+fitness_data_to_plot <- subset(fitness_data_to_plot, fitness_data_to_plot$condition=="HL_5N2" | fitness_data_to_plot$condition=="HL_5O2" | fitness_data_to_plot$condition=="LD_N2")
+fitness_data_to_plot[fitness_data_to_plot$condition=="HL_5N2",]$fitness <- scale(fitness_data_to_plot[fitness_data_to_plot$condition=="HL_5N2",]$fitness)[,1]
+fitness_data_to_plot[fitness_data_to_plot$condition=="HL_5O2",]$fitness <- scale(fitness_data_to_plot[fitness_data_to_plot$condition=="HL_5O2",]$fitness)[,1]
+fitness_data_to_plot[fitness_data_to_plot$condition=="LD_N2",]$fitness <- scale(fitness_data_to_plot[fitness_data_to_plot$condition=="LD_N2",]$fitness)[,1]
+fitness_data_to_plot$sgRNA <- factor(fitness_data_to_plot$sgRNA, levels=c("WT", "mut4", "mut2", "mut5", "mut1", "K", "B", "I", "G", "E", "A", "2B4", "2I2", "A41", "2A1", "4x"))
+p <- ggplot(fitness_data_to_plot, aes(y=fitness, x=sgRNA, fill=condition)) + geom_bar(stat="identity", position="dodge")+ theme_light() + xlab("Mutant variant") + ylab("Z-scaled fitness values") + scale_fill_manual(values=c("HL_5N2"="#999999ff", "HL_5O2"="#d45d00ff", "LD_N2"="#0072b1ff"))# scale_fill_OkabeIto()
+p
+ggsave("../output_images/barplot_differentconditions_scaled.pdf", plot=p, height=11, width=18, units="cm")
+```
+
+# Scatter plots
+
+```{r scatter-plots}
+red_fitness <- unique(fitness_data[c("sgRNA", "condition", "fitness")])
+wide_fitness <- pivot_wider(red_fitness, names_from=condition, values_from=c(fitness))
+```
+
+```{r scatter_N_O}
+lm_N2_O2 <- lm(HL_5O2~HL_5N2, wide_fitness)
+correlation <- cor.test(wide_fitness$HL_5O2, wide_fitness$HL_5N2, method = 'pearson')
+correlation
+correlation <- cor.test(wide_fitness$HL_5O2, wide_fitness$HL_5N2, method = 'spearman')
+correlation
+scat <- ggplot(wide_fitness, aes(x=HL_5N2, y=HL_5O2, label=sgRNA)) + geom_point(color="darkgray") + theme_light() + geom_text_repel() + geom_abline(intercept=lm_N2_O2$coefficients[1],slope=lm_N2_O2$coefficients[2],linetype="dashed",color="black") + xlim(-2.75, 3.5) + ylim(-2.75, 3.5) + xlab("Fitness constant light, 5% CO2, N2") + ylab("Fitness constant light, 5% CO2, ambient air")
+scat
+ggsave("../output_images/scatterplots/scatter_N2_O2.pdf", scat, width=18, height=18, units="cm")
+```
+
+```{r scatter_N_LD}
+scat <- ggplot(wide_fitness, aes(x=HL_5N2, y=LD_N2, label=sgRNA)) + geom_point(color="darkgray") + theme_light()  + geom_text_repel() + xlab("Fitness constant light, 5% CO2, N2") + ylab("Fitness light-dark cycles, 5% CO2, N2")
+scat
+ggsave("../output_images/scatterplots/scatter_N2_LD.pdf", scat, width=18, height=18, units="cm")
+```
+
+```{r scatter_EVmut}
+EVmut <- read.table("../input/2024-03-26_predictions_combinations_smallSubset.tsv", sep="\t", header=TRUE)
+combo_sgRNA <- read.table("../input/combo_mutName.csv", header=TRUE)
+EVmut_sgRNA <- left_join(EVmut, combo_sgRNA)
+wide_fitness_EVmut <- left_join(wide_fitness, EVmut_sgRNA)
+scat <- ggplot(wide_fitness_EVmut, aes(x=HL_5N2, y=Score, label=sgRNA)) + geom_point(color="darkgray") + theme_light()  + geom_text_repel() + xlab("Fitness constant light, 5% CO2, N2") + ylab("EVmutation score")
+scat
+ggsave("../output_images/scatterplots/HL_5N2_EVmut.pdf", scat, width=18, height=18, units="cm")
+```
+
+```{r scatter_LD_EVmut}
+scat <- ggplot(wide_fitness_EVmut, aes(x=LD_N2, y=Score, label=sgRNA)) + geom_point(color="darkgray") + theme_light()  + geom_text_repel() + xlab("Fitness light-dark cycles, 5% CO2, N2") + ylab("EVmutation score")
+scat
+ggsave("../output_images/scatterplots/LDN2_EVmut.pdf", scat)
+```
+
+```{r scatter_numMut}
+wide_fitness_EVmut$numberMut <- c(3,3,3,4,2,3,2,2,2,2,2,1,1,1,1,0)
+scat <- ggplot(wide_fitness_EVmut, aes(x=LD_N2, y=numberMut, label=sgRNA)) + geom_point(color="darkgray") + theme_light()  + geom_text_repel() + xlab("Fitness light-dark cycles, 5% CO2, N2") + ylab("Number mutations")
+scat
+ggsave("../output_images/scatterplots/LDN2_numMut.pdf", scat)
+scat <- ggplot(wide_fitness_EVmut, aes(x=HL_5N2, y=numberMut, label=sgRNA)) + geom_point(color="darkgray") + theme_light()  + geom_text_repel() + xlab("Fitness constant light, 5% CO2, N2") + ylab("Number mutations")
+scat
+ggsave("../output_images/scatterplots/N2_numMut.pdf", scat)
+```
+
+
+```{r linear-regressions}
+summary(lm(HL_5N2 ~ Score, wide_fitness_EVmut))
+summary(lm(HL_5N2 ~ numberMut, wide_fitness_EVmut))
+summary(lm(LD_N2 ~ Score, wide_fitness_EVmut))
+```
+
+
+# Session Info {.unnumbered}
+
+```{r sessionInfo, echo=FALSE}
+sessionInfo()
+```
+

@@ -1,0 +1,66 @@
+This is cutadapt 4.6 with Python 3.9.18
+Command line parameters: -Z --cores 5 -g GTCTAGAatcgccgaaagtaattcaactccattaa...TCTAGATGCTTACTAGTTACCGCGGCCA -e 0.2 -o HL_5O2_t3_R4.trim.fastq.gz HL_5O2_t3_R4_trimmed.fq.gz
+Processing single-end reads on 5 cores ...
+Finished in 0.265 s (25.987 µs/read; 2.31 M reads/minute).
+
+=== Summary ===
+
+Total reads processed:                  10,202
+Reads with adapters:                     9,809 (96.1%)
+Reads written (passing filters):        10,202 (100.0%)
+
+Total basepairs processed:       876,445 bp
+Total written (filtered):        232,041 bp (26.5%)
+
+=== Adapter 1 ===
+
+Sequence: GTCTAGAATCGCCGAAAGTAATTCAACTCCATTAA...TCTAGATGCTTACTAGTTACCGCGGCCA; Type: linked; Length: 35+28; 5' trimmed: 9809 times; 3' trimmed: 9809 times
+
+Minimum overlap: 3+3
+No. of allowed errors:
+1-4 bp: 0; 5-9 bp: 1; 10-14 bp: 2; 15-19 bp: 3; 20-24 bp: 4; 25-29 bp: 5; 30-34 bp: 6; 35 bp: 7
+
+No. of allowed errors:
+1-4 bp: 0; 5-9 bp: 1; 10-14 bp: 2; 15-19 bp: 3; 20-24 bp: 4; 25-28 bp: 5
+
+Overview of removed sequences at 5' end
+length	count	expect	max.err	error counts
+35	43	0.0	7	0 3 3 3 3 15 7 9
+36	2454	0.0	7	54 228 415 542 547 358 230 80
+37	3841	0.0	7	5 76 241 667 1080 971 561 240
+38	3460	0.0	7	63 636 1419 734 371 149 65 23
+39	11	0.0	7	0 0 4 4 1 1 0 1
+
+
+
+Overview of removed sequences at 3' end
+length	count	expect	max.err	error counts
+4	1	39.9	0	0 1
+5	5	10.0	1	0 5
+6	2	2.5	1	0 2
+14	1	0.0	2	0 1
+15	1	0.0	3	1
+16	1	0.0	3	0 1
+18	1	0.0	3	0 1
+21	1	0.0	4	0 1
+23	1	0.0	4	0 0 0 1
+24	12	0.0	4	7 1 3 1
+25	30	0.0	5	4 9 8 4 3 2
+26	28	0.0	5	4 8 7 7 2
+27	1241	0.0	5	829 265 102 31 11 3
+28	7905	0.0	5	4748 2328 558 178 57 36
+29	16	0.0	5	1 9 3 2 0 1
+30	2	0.0	5	1 1
+31	3	0.0	5	0 0 0 2 1
+33	3	0.0	5	0 1 0 0 1 1
+35	1	0.0	5	0 0 0 0 1
+36	5	0.0	5	1 1 1 0 1 1
+37	6	0.0	5	0 0 0 2 2 2
+38	12	0.0	5	2 0 2 3 2 3
+39	19	0.0	5	3 9 4 2 1
+40	64	0.0	5	9 5 8 16 19 7
+41	168	0.0	5	28 35 33 35 20 17
+42	77	0.0	5	5 21 15 19 11 6
+43	198	0.0	5	20 47 48 43 26 14
+44	3	0.0	5	1 2
+45	2	0.0	5	1 1

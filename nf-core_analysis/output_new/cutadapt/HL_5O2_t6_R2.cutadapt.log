@@ -1,0 +1,64 @@
+This is cutadapt 4.6 with Python 3.9.18
+Command line parameters: -Z --cores 5 -g GTCTAGAatcgccgaaagtaattcaactccattaa...TCTAGATGCTTACTAGTTACCGCGGCCA -e 0.2 -o HL_5O2_t6_R2.trim.fastq.gz HL_5O2_t6_R2_trimmed.fq.gz
+Processing single-end reads on 5 cores ...
+Finished in 0.153 s (35.795 µs/read; 1.68 M reads/minute).
+
+=== Summary ===
+
+Total reads processed:                   4,268
+Reads with adapters:                     3,512 (82.3%)
+Reads written (passing filters):         4,268 (100.0%)
+
+Total basepairs processed:       363,848 bp
+Total written (filtered):        132,013 bp (36.3%)
+
+=== Adapter 1 ===
+
+Sequence: GTCTAGAATCGCCGAAAGTAATTCAACTCCATTAA...TCTAGATGCTTACTAGTTACCGCGGCCA; Type: linked; Length: 35+28; 5' trimmed: 3512 times; 3' trimmed: 3512 times
+
+Minimum overlap: 3+3
+No. of allowed errors:
+1-4 bp: 0; 5-9 bp: 1; 10-14 bp: 2; 15-19 bp: 3; 20-24 bp: 4; 25-29 bp: 5; 30-34 bp: 6; 35 bp: 7
+
+No. of allowed errors:
+1-4 bp: 0; 5-9 bp: 1; 10-14 bp: 2; 15-19 bp: 3; 20-24 bp: 4; 25-28 bp: 5
+
+Overview of removed sequences at 5' end
+length	count	expect	max.err	error counts
+26	1	0.0	5	0 0 1
+35	16	0.0	7	0 0 0 0 3 8 3 2
+36	874	0.0	7	20 69 114 177 190 156 115 33
+37	1408	0.0	7	1 21 58 188 356 445 223 116
+38	1212	0.0	7	15 157 492 297 137 73 30 11
+39	1	0.0	7	0 0 0 0 0 0 1
+
+
+
+Overview of removed sequences at 3' end
+length	count	expect	max.err	error counts
+5	4	4.2	1	0 4
+6	1	1.0	1	0 1
+14	1	0.0	2	1
+15	1	0.0	3	0 1
+19	2	0.0	3	0 2
+22	1	0.0	4	0 0 0 1
+23	1	0.0	4	0 0 1
+24	2	0.0	4	0 0 0 1 1
+25	5	0.0	5	0 2 1 1 0 1
+26	9	0.0	5	0 2 4 2 1
+27	386	0.0	5	244 76 47 13 5 1
+28	2800	0.0	5	1472 960 243 80 32 13
+29	7	0.0	5	0 3 1 2 0 1
+30	1	0.0	5	1
+31	2	0.0	5	0 0 1 0 0 1
+32	3	0.0	5	0 0 0 2 1
+35	2	0.0	5	0 0 1 0 0 1
+36	3	0.0	5	0 0 0 1 1 1
+37	7	0.0	5	0 0 1 1 1 4
+38	5	0.0	5	0 2 0 2 1
+39	11	0.0	5	1 3 3 2 1 1
+40	31	0.0	5	5 4 3 8 7 4
+41	89	0.0	5	8 19 19 21 14 8
+42	45	0.0	5	3 8 8 8 10 8
+43	91	0.0	5	8 19 31 15 10 8
+44	2	0.0	5	0 0 0 0 1 1

@@ -1,0 +1,74 @@
+
+SUMMARISING RUN PARAMETERS
+==========================
+Input filename: LD_N2_t1_R2.fastq.gz
+Trimming mode: single-end
+Trim Galore version: 0.6.7
+Cutadapt version: 3.4
+Python version: could not detect
+Number of cores used for trimming: 2
+Quality Phred score cutoff: 20
+Quality encoding type selected: ASCII+33
+Using Illumina adapter for trimming (count: 12). Second best hit was Nextera (count: 0)
+Adapter sequence: 'AGATCGGAAGAGC' (Illumina TruSeq, Sanger iPCR; auto-detected)
+Maximum trimming error rate: 0.1 (default)
+Minimum required adapter overlap (stringency): 6 bp
+Minimum required sequence length before a sequence gets removed: 20 bp
+Output file will be GZIP compressed
+
+
+This is cutadapt 3.4 with Python 3.9.6
+Command line parameters: -j 2 -e 0.1 -q 20 -O 6 -a AGATCGGAAGAGC LD_N2_t1_R2.fastq.gz
+Processing reads on 2 cores in single-end mode ...
+Finished in 0.30 s (8 µs/read; 7.46 M reads/minute).
+
+=== Summary ===
+
+Total reads processed:                  37,681
+Reads with adapters:                       488 (1.3%)
+Reads written (passing filters):        37,681 (100.0%)
+
+Total basepairs processed:     3,262,152 bp
+Quality-trimmed:                  10,474 bp (0.3%)
+Total written (filtered):      3,245,630 bp (99.5%)
+
+=== Adapter 1 ===
+
+Sequence: AGATCGGAAGAGC; Type: regular 3'; Length: 13; Trimmed: 488 times
+
+No. of allowed errors:
+1-9 bp: 0; 10-13 bp: 1
+
+Bases preceding removed adapters:
+  A: 97.1%
+  C: 0.2%
+  G: 0.8%
+  T: 1.8%
+  none/other: 0.0%
+WARNING:
+    The adapter is preceded by "A" extremely often.
+    The provided adapter sequence could be incomplete at its 5' end.
+
+Overview of removed sequences
+length	count	expect	max.err	error counts
+9	4	0.1	0	4
+10	140	0.0	1	15 125
+11	37	0.0	1	2 35
+12	77	0.0	1	4 73
+13	36	0.0	1	0 36
+14	159	0.0	1	6 153
+15	17	0.0	1	0 17
+16	16	0.0	1	4 12
+34	1	0.0	1	0 1
+42	1	0.0	1	1
+
+
+WARNING:
+    One or more of your adapter sequences may be incomplete.
+    Please see the detailed output above.
+
+RUN STATISTICS FOR INPUT FILE: LD_N2_t1_R2.fastq.gz
+=============================================
+37681 sequences processed in total
+Sequences removed because they became shorter than the length cutoff of 20 bp:	4 (0.0%)
+

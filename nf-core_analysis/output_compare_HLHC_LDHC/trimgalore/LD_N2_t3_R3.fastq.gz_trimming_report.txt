@@ -1,0 +1,81 @@
+
+SUMMARISING RUN PARAMETERS
+==========================
+Input filename: LD_N2_t3_R3.fastq.gz
+Trimming mode: single-end
+Trim Galore version: 0.6.7
+Cutadapt version: 3.4
+Python version: could not detect
+Number of cores used for trimming: 2
+Quality Phred score cutoff: 20
+Quality encoding type selected: ASCII+33
+Using Illumina adapter for trimming (count: 60). Second best hit was smallRNA (count: 0)
+Adapter sequence: 'AGATCGGAAGAGC' (Illumina TruSeq, Sanger iPCR; auto-detected)
+Maximum trimming error rate: 0.1 (default)
+Minimum required adapter overlap (stringency): 6 bp
+Minimum required sequence length before a sequence gets removed: 20 bp
+Output file will be GZIP compressed
+
+
+This is cutadapt 3.4 with Python 3.9.6
+Command line parameters: -j 2 -e 0.1 -q 20 -O 6 -a AGATCGGAAGAGC LD_N2_t3_R3.fastq.gz
+Processing reads on 2 cores in single-end mode ...
+Finished in 1.64 s (7 µs/read; 8.69 M reads/minute).
+
+=== Summary ===
+
+Total reads processed:                 238,065
+Reads with adapters:                     4,033 (1.7%)
+Reads written (passing filters):       238,065 (100.0%)
+
+Total basepairs processed:    20,646,389 bp
+Quality-trimmed:                 122,427 bp (0.6%)
+Total written (filtered):     20,474,897 bp (99.2%)
+
+=== Adapter 1 ===
+
+Sequence: AGATCGGAAGAGC; Type: regular 3'; Length: 13; Trimmed: 4033 times
+
+No. of allowed errors:
+1-9 bp: 0; 10-13 bp: 1
+
+Bases preceding removed adapters:
+  A: 91.8%
+  C: 0.8%
+  G: 1.6%
+  T: 5.8%
+  none/other: 0.0%
+WARNING:
+    The adapter is preceded by "A" extremely often.
+    The provided adapter sequence could be incomplete at its 5' end.
+
+Overview of removed sequences
+length	count	expect	max.err	error counts
+6	4	58.1	0	4
+7	4	14.5	0	4
+8	20	3.6	0	20
+9	15	0.9	0	15
+10	1192	0.2	1	171 1021
+11	412	0.1	1	38 374
+12	689	0.0	1	35 654
+13	268	0.0	1	4 264
+14	1121	0.0	1	35 1086
+15	186	0.0	1	2 184
+16	112	0.0	1	16 96
+17	1	0.0	1	0 1
+18	2	0.0	1	1 1
+19	2	0.0	1	1 1
+20	3	0.0	1	0 3
+42	1	0.0	1	0 1
+45	1	0.0	1	0 1
+
+
+WARNING:
+    One or more of your adapter sequences may be incomplete.
+    Please see the detailed output above.
+
+RUN STATISTICS FOR INPUT FILE: LD_N2_t3_R3.fastq.gz
+=============================================
+238065 sequences processed in total
+Sequences removed because they became shorter than the length cutoff of 20 bp:	9 (0.0%)
+
